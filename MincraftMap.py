@@ -48,13 +48,14 @@ def check_qq_json():
 
 # Run the asynchronous function
 def send_message_to_mc(data):
-    data_group_id = data.get('group_id', None)
-    data_messages = data.get('message', None)
-    if data_group_id is not None and data_messages is not None:
-        for message in data_messages:
-            if message['type'] == 'text' and data_group_id == '897177775' and message['data']['text'][:2] == 'mc':
-                print(message['data']['text'][2:])
-                return message['data']['text'][2:]
+    if data is not None:
+        data_group_id = data.get('group_id', None)
+        data_messages = data.get('message', None)
+        if data_group_id is not None and data_messages is not None:
+            for message in data_messages:
+                if message['type'] == 'text' and data_group_id == '897177775' and message['data']['text'][:2] == 'mc':
+                    print(message['data']['text'][2:])
+                    return message['data']['text'][2:]
     return None
 
 
