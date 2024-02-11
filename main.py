@@ -1,16 +1,24 @@
-# This is a sample Python script.
+import json
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from flask import Flask, request, jsonify
 
 
-# Press the green button in the gutter to run the script.
+app = Flask(__name__)
+
+
+@app.route('/', methods=['POST'])
+def receive_json():
+    # Get JSON data from the POST request
+    data = request.get_json()
+
+    with open('data.json', 'w') as f:
+        json.dump(data, f)
+    # Do something with the data (here we are just printing it)
+    print(data)
+
+    # Respond to the client
+    return jsonify({'status': 'success', 'data_received': data}), 200
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    app.run(debug=True, host='127.0.0.1', port=80)

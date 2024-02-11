@@ -1,6 +1,38 @@
+import json
+import os
+
+import nonebot
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+import datetime
+import nonebot
+from flask import Flask, request, jsonify
+
+
+def open_close_group_bot(data):
+    data_group_id = data.get('group_id', None)
+    data_messages = data.get('message', None)
+    if data_group_id is not None and data_messages is not None:
+        for message in data_messages:
+            if message['type'] == 'text':
+                if data_group_id == '897177775':
+                    if message['data']['text'] == 'open':
+                        return 'open'
+                    elif message['data']['text'] == 'close':
+                        return 'close'
+    return None
+
+
+def check_qq_json():
+    file_path = 'data.json'
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+        # Read the JSON data from the file
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data
+    else:
+        return None
 
 
 def get_Mincraft_message2():
@@ -85,9 +117,15 @@ def get_Mincraft_message():
     else:
         return None
 
+
+bot_state = 'close'
 tem_message = None
 while True:
+    json_data = check_qq_json()
+    tem_state = open_close_group_bot(json_data)
+    if tem_state is not None:
+        bot_state = tem_state
     message_list = get_Mincraft_message2()
-    if message_list != None and message_list[1] != tem_message:
+    if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
         tem_message = message_list[1]
         send_group_message(message_list[0], message_list[1])

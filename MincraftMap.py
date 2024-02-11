@@ -1,3 +1,6 @@
+import json
+import os
+
 import requests
 import asyncio
 from pyppeteer import launch
@@ -32,7 +35,27 @@ async def get_Minecraft_Map_information(url, input_selector, message):
 
 # The URL you want to scrape
 
+def check_qq_json():
+    file_path = 'data.json'
+    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+        # Read the JSON data from the file
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data
+    else:
+        return None
+
+
 # Run the asynchronous function
+def send_message_to_mc(data):
+    data_group_id = data.get('group_id', None)
+    data_messages = data.get('message', None)
+    if data_group_id is not None and data_messages is not None:
+        for message in data_messages:
+            if message['type'] == 'text' and data_group_id == '897177775' and message['data']['text'][:2] == 'mc':
+                print(message['data']['text'][2:])
+                return message['data']['text'][2:]
+    return None
 
 
 def get_Mincraft_information():
@@ -198,12 +221,12 @@ def get_Mincraft_message2():
 # get_Mincraft_timestamp_information(timestamp)
 # send_message_to_server()
 tem_message = None
+tem_message2 = None
+url = 'http://main.wycraft.cn:45502/'
+input_selector = '#chatinput'
 while True:
-    url = 'http://main.wycraft.cn:45502/'
-    input_selector = '#chatinput'
     user_send_message = get_Mincraft_message2()
     if tem_message is not None:
-        print('tem_message')
         print('------------------------------')
         print(tem_message)
     if user_send_message is not None and user_send_message[:2] == 'ai' and user_send_message != tem_message:
@@ -212,3 +235,11 @@ while True:
         out_message = out_message.replace(" ", "").replace("\n", "")
         print(out_message)
         asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, out_message))
+    json_data = check_qq_json()
+    check_message = send_message_to_mc(json_data)
+    if check_message is not None and check_message != tem_message2:
+        tem_message2 = check_message
+        check_message = "来自远方的旅行者说" + check_message
+        print(check_message)
+        print('success')
+        asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, check_message))
