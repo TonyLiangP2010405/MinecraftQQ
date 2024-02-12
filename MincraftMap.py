@@ -36,14 +36,15 @@ async def get_Minecraft_Map_information(url, input_selector, message):
 # The URL you want to scrape
 
 def check_qq_json():
-    file_path = 'data.json'
-    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-        # Read the JSON data from the file
-        with open(file_path, 'r') as f:
+    with open('path_to_your_file.json', 'r') as f:
+        if f.read().strip():
+            # Move the file pointer back to the start of the file
+            f.seek(0)
             data = json.load(f)
             return data
-    else:
-        return None
+        else:
+            print('File is empty.')
+            return None  # or return {}, depending on how you want to handle an empty file.
 
 
 # Run the asynchronous function
@@ -237,10 +238,11 @@ while True:
         print(out_message)
         asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, out_message))
     json_data = check_qq_json()
-    check_message = send_message_to_mc(json_data)
-    if check_message is not None and check_message != tem_message2:
-        tem_message2 = check_message
-        check_message = "来自远方的旅行者说" + check_message
-        print(check_message)
-        print('success')
-        asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, check_message))
+    if json_data is not None:
+        check_message = send_message_to_mc(json_data)
+        if check_message is not None and check_message != tem_message2:
+            tem_message2 = check_message
+            check_message = "来自远方的旅行者说" + check_message
+            print(check_message)
+            print('success')
+            asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, check_message))

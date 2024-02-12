@@ -26,14 +26,15 @@ def open_close_group_bot(data):
 
 
 def check_qq_json():
-    file_path = 'data.json'
-    if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-        # Read the JSON data from the file
-        with open(file_path, 'r') as f:
+    with open('path_to_your_file.json', 'r') as f:
+        if f.read().strip():
+            # Move the file pointer back to the start of the file
+            f.seek(0)
             data = json.load(f)
             return data
-    else:
-        return None
+        else:
+            print('File is empty.')
+            return None  # or return {}, depending on how you want to handle an empty file.
 
 
 def get_Mincraft_message2():
@@ -123,10 +124,11 @@ bot_state = 'close'
 tem_message = None
 while True:
     json_data = check_qq_json()
-    tem_state = open_close_group_bot(json_data)
-    if tem_state is not None:
-        bot_state = tem_state
-    message_list = get_Mincraft_message2()
-    if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
-        tem_message = message_list[1]
-        send_group_message(message_list[0], message_list[1])
+    if json_data is not None:
+        tem_state = open_close_group_bot(json_data)
+        if tem_state is not None:
+            bot_state = tem_state
+        message_list = get_Mincraft_message2()
+        if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
+            tem_message = message_list[1]
+            send_group_message(message_list[0], message_list[1])
