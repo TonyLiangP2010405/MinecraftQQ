@@ -36,7 +36,7 @@ async def get_Minecraft_Map_information(url, input_selector, message):
 # The URL you want to scrape
 
 def check_qq_json():
-    with open('path_to_your_file.json', 'r') as f:
+    with open('data.json', 'r') as f:
         if f.read().strip():
             # Move the file pointer back to the start of the file
             f.seek(0)

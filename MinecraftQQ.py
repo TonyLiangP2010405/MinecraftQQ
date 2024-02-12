@@ -23,7 +23,7 @@ def open_close_group_bot(data):
 
 
 def check_qq_json():
-    with open('path_to_your_file.json', 'r') as f:
+    with open('data.json', 'r') as f:
         if f.read().strip():
             # Move the file pointer back to the start of the file
             f.seek(0)
