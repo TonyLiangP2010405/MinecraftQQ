@@ -1,12 +1,9 @@
 import json
 import os
-
-import nonebot
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 import datetime
-import nonebot
 from flask import Flask, request, jsonify
 
 
