@@ -17,7 +17,7 @@ def open_close_group_bot(data):
         if data_group_id is not None and data_messages is not None:
             for message in data_messages:
                 if message['type'] == 'text':
-                    if data_group_id == '897177775':
+                    if data_group_id == '856708153':
                         if message['data']['text'] == 'open':
                             return 'open'
                         elif message['data']['text'] == 'close':
@@ -83,7 +83,7 @@ def get_Mincraft_message2():
 def send_group_message(player, message):
     url = 'http://127.0.0.1:3000/send_group_msg'
     data = {
-        'group_id': '897177775',
+        'group_id': '856708153',
         'message': [
             {
                 "type": "text",
