@@ -150,7 +150,7 @@ while True:
         tem_state = open_close_group_bot(json_data, bot_state_timer)
         if bot_state == 'close' and tem_state == 'open':
             bot_state_timer = 0
-        if bot_state == 'open' and tem_state == 'close':
+        elif bot_state == 'open' and tem_state == 'close':
             bot_state_timer = 0
         else:
             bot_state_timer = 1
