@@ -147,7 +147,6 @@ while True:
         tem_state = open_close_group_bot(json_data)
         if tem_state is not None:
             bot_state = tem_state
-            send_group_message('bot', '当前bot的状态为' + bot_state)
         message_list = get_Mincraft_message2()
         if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
             tem_message = message_list[1]
