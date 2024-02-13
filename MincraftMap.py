@@ -284,7 +284,7 @@ while True:
         check_message = get_message_from_qq(json_data)
         if check_message is not None and check_message != tem_message2:
             tem_message2 = check_message
-            check_message = "来自远方的旅行者说" + check_message
+            check_message = "来自远方的旅行者说:" + check_message
             print('success')
             asyncio.get_event_loop().run_until_complete(
                 send_message_to_MinecraftMap2(url, input_selector, check_message))

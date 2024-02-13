@@ -3,7 +3,7 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 
-def open_close_group_bot(data):
+def open_close_group_bot(data, timer):
     if data is not None:
         data_group_id = data.get('group_id', None)
         data_messages = data.get('message', None)
@@ -12,10 +12,12 @@ def open_close_group_bot(data):
                 if message['type'] == 'text':
                     if data_group_id == '856708153':
                         if message['data']['text'] == 'open':
-                            send_group_message('bot', '当前bot的状态为open')
+                            if timer == 0:
+                                send_group_message('bot', '当前bot的状态为open')
                             return 'open'
                         elif message['data']['text'] == 'close':
-                            send_group_message('bot', '当前bot的状态为close')
+                            if timer == 0:
+                                send_group_message('bot', '当前bot的状态为close')
                             return 'close'
     return None
 
@@ -108,7 +110,7 @@ def send_group_message(player, message):
             {
                 "type": "text",
                 "data": {
-                    "text":"[world]" + "["+player+"]" + ":" + message
+                    "text": "[world]" + "[" + player + "]" + ":" + message
                 }
             }
         ]
@@ -140,11 +142,18 @@ def get_Mincraft_message():
 
 
 bot_state = 'close'
+bot_state_timer = 0
 tem_message = None
 while True:
     json_data = check_qq_json2()
     if json_data is not None:
-        tem_state = open_close_group_bot(json_data)
+        tem_state = open_close_group_bot(json_data, bot_state_timer)
+        if bot_state == 'close' and tem_state == 'open':
+            bot_state_timer = 0
+        if bot_state == 'open' and tem_state == 'close':
+            bot_state_timer = 0
+        else:
+            bot_state_timer = 1
         if tem_state is not None:
             bot_state = tem_state
         message_list = get_Mincraft_message2()
