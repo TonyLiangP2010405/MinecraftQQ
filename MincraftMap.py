@@ -10,9 +10,8 @@ from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
 
-async def get_Minecraft_Map_information(url, input_selector, message):
+async def send_message_to_MinecraftMap(url, input_selector, message):
     browser = await launch()
-
     # Create a new page
     page = await browser.newPage()
 
@@ -20,6 +19,28 @@ async def get_Minecraft_Map_information(url, input_selector, message):
     await page.goto(url, {'waitUntil': 'networkidle0'})
     await page.waitForSelector(input_selector)
     await page.evaluate(f"""document.querySelector('{input_selector}').value = `{message}`;""")
+    await page.click(input_selector)
+    await page.type(input_selector, message)
+    await page.keyboard.press('Enter')
+    # If necessary, wait for a specific element that is dynamically loaded
+    # await page.waitForSelector('yourSelector')
+
+    # Evaluate page and return the content
+    content = await page.evaluate('() => document.documentElement.outerHTML')
+
+    # Close the browser
+    await browser.close()
+
+
+async def send_message_to_MinecraftMap2(url, input_selector, message):
+    browser = await launch()
+    # Create a new page
+    page = await browser.newPage()
+
+    # Navigate to the URL
+    await page.goto(url, {'waitUntil': 'networkidle0'})
+    await page.waitForSelector(input_selector)
+    # Removed the line that was directly setting the input value
     await page.click(input_selector)
     await page.type(input_selector, message)
     await page.keyboard.press('Enter')
@@ -47,15 +68,37 @@ def check_qq_json():
             return None  # or return {}, depending on how you want to handle an empty file.
 
 
+import json
+import os
+
+
+def check_qq_json2(file_path='data.json'):
+    # Check if the file exists and is not empty
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        print(f'File {file_path} is empty or does not exist.')
+        return None  # or return {}, depending on how you want to handle this case
+
+    # If the file exists and is not empty, attempt to parse it as JSON
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data
+    except json.JSONDecodeError as e:
+        print(f'JSON decode error in file {file_path}: {e}')
+        return None  # or handle the error as needed
+    except Exception as e:
+        print(f'An unexpected error occurred: {e}')
+        return None  # or handle the error as needed
+
+
 # Run the asynchronous function
-def send_message_to_mc(data):
+def get_message_from_qq(data):
     if data is not None:
         data_group_id = data.get('group_id', None)
         data_messages = data.get('message', None)
         if data_group_id is not None and data_messages is not None:
             for message in data_messages:
                 if message['type'] == 'text' and data_group_id == '856708153' and message['data']['text'][:2] == 'mc':
-                    print(message['data']['text'][2:])
                     return message['data']['text'][2:]
     return None
 
@@ -235,14 +278,13 @@ while True:
         tem_message = user_send_message
         out_message = ask_Ai_model(user_send_message[2:])
         out_message = out_message.replace(" ", "").replace("\n", "")
-        print(out_message)
-        asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, out_message))
-    json_data = check_qq_json()
+        asyncio.get_event_loop().run_until_complete(send_message_to_MinecraftMap2(url, input_selector, out_message))
+    json_data = check_qq_json2()
     if json_data is not None:
-        check_message = send_message_to_mc(json_data)
+        check_message = get_message_from_qq(json_data)
         if check_message is not None and check_message != tem_message2:
             tem_message2 = check_message
             check_message = "来自远方的旅行者说" + check_message
-            print(check_message)
             print('success')
-            asyncio.get_event_loop().run_until_complete(get_Minecraft_Map_information(url, input_selector, check_message))
+            asyncio.get_event_loop().run_until_complete(
+                send_message_to_MinecraftMap2(url, input_selector, check_message))
