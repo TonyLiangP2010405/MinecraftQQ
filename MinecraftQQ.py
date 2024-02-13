@@ -1,10 +1,6 @@
-import json
-import os
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
-import datetime
-from flask import Flask, request, jsonify
 
 
 def open_close_group_bot(data):
@@ -32,6 +28,29 @@ def check_qq_json():
         else:
             print('File is empty.')
             return None  # or return {}, depending on how you want to handle an empty file.
+
+
+import json
+import os
+
+
+def check_qq_json2(file_path='data.json'):
+    # Check if the file exists and is not empty
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        print(f'File {file_path} is empty or does not exist.')
+        return None  # or return {}, depending on how you want to handle this case
+
+    # If the file exists and is not empty, attempt to parse it as JSON
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+            return data
+    except json.JSONDecodeError as e:
+        print(f'JSON decode error in file {file_path}: {e}')
+        return None  # or handle the error as needed
+    except Exception as e:
+        print(f'An unexpected error occurred: {e}')
+        return None  # or handle the error as needed
 
 
 def get_Mincraft_message2():
@@ -79,6 +98,7 @@ def get_Mincraft_message2():
 
 
 def send_group_message(player, message):
+    print(message)
     url = 'http://127.0.0.1:3000/send_group_msg'
     data = {
         'group_id': '856708153',
@@ -86,7 +106,7 @@ def send_group_message(player, message):
             {
                 "type": "text",
                 "data": {
-                    "text": player + "在我的世界说:" + message
+                    "text":"[world]" + "["+player+"]" + ":" + message
                 }
             }
         ]
@@ -120,11 +140,12 @@ def get_Mincraft_message():
 bot_state = 'close'
 tem_message = None
 while True:
-    json_data = check_qq_json()
+    json_data = check_qq_json2()
     if json_data is not None:
         tem_state = open_close_group_bot(json_data)
         if tem_state is not None:
             bot_state = tem_state
+            send_group_message('bot', '当前bot的状态为' + bot_state)
         message_list = get_Mincraft_message2()
         if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
             tem_message = message_list[1]
