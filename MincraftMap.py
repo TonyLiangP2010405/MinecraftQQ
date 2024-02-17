@@ -96,10 +96,17 @@ def get_message_from_qq(data):
     if data is not None:
         data_group_id = data.get('group_id', None)
         data_messages = data.get('message', None)
-        if data_group_id is not None and data_messages is not None:
+        sender = data.get('sender', None)
+        if data_group_id is not None and data_messages is not None and sender is not None:
             for message in data_messages:
                 if message['type'] == 'text' and data_group_id == '856708153' and message['data']['text'][:2] == 'mc':
-                    return message['data']['text'][2:]
+                    content = message['data']['text'][2:]
+                    nickname = sender['nickname']
+                    card = sender['card']
+                    if nickname != '':
+                        return nickname + "说:" + content
+                    else:
+                        return card + "说:" + content
     return None
 
 
@@ -284,7 +291,7 @@ while True:
         check_message = get_message_from_qq(json_data)
         if check_message is not None and check_message != tem_message2:
             tem_message2 = check_message
-            check_message = "来自远方的旅行者说:" + check_message
+            check_message = check_message
             print('success')
             asyncio.get_event_loop().run_until_complete(
                 send_message_to_MinecraftMap2(url, input_selector, check_message))
