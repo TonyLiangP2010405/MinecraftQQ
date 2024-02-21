@@ -177,6 +177,9 @@ def send_group_message_image(meme_original_path):
             os.remove(absolute_path)
         else:
             print("Error:", response.text)
+    else:
+        get_result_image(meme_original_path)
+        send_group_message_image(meme_original_path)
 
 def get_Mincraft_message():
     url = 'http://main.wycraft.cn:45502/up/world/world/'
