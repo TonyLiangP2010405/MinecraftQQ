@@ -7,6 +7,7 @@ with open(image_path, 'rb') as image:
     files = {'images': (image_path, image, 'multipart/form-data')}
     response = requests.post(url, files=files)
 
+
 if response.status_code == 200:
     print('Success!')
     # Process response here
