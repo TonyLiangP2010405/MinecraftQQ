@@ -10,6 +10,7 @@ app = Flask(__name__)
 def receive_json():
     # Get JSON data from the POST request
     data = request.get_json()
+    print(data)
 
     with open('data.json', 'w') as f:
         json.dump(data, f)

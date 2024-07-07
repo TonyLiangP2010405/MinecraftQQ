@@ -68,8 +68,6 @@ def check_qq_json():
             return None  # or return {}, depending on how you want to handle an empty file.
 
 
-import json
-import os
 
 
 def check_qq_json2(file_path='data.json'):
