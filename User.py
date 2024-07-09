@@ -1,6 +1,6 @@
 import json
 import os
-
+import random
 import requests
 import sqlite3
 
@@ -34,36 +34,30 @@ class User:
 
     def get_group_user_name(self):
         data = self.data
-        message_type = data['message_type']
-        if message_type == "group":
-            username = data['sender']['nickname']
-            self.username = username
-        else:
-            self.username = None
+        if 'message_type' in data:
+            message_type = data['message_type']
+            if message_type == "group":
+                username = data['sender']['nickname']
+                self.username = username
+            else:
+                self.username = None
 
     def get_group_user_qq(self):
         data = self.data
-        message_type = data['message_type']
-        if message_type == 'group':
-            qq = data['sender']['user_id']
-            self.qq = qq
+        if 'message_type' in data:
+            message_type = data['message_type']
+            if message_type == 'group':
+                qq = data['sender']['user_id']
+                self.qq = qq
 
     def get_group_user_message(self):
         data = self.data
-        if data['message'][0]["type"] == "text":
-            text = data['message'][0]['data']['text']
-            self.message = text
+        if data is not None and 'message' in data:
+            messages = data['message']
+            for message in messages:
+                if message["type"] == "text":
+                    text = message['data']['text']
+                    self.message = text
 
-    # def record_group_message(self):
-    #     filename = 'message.db'
-    #     conn = None
-    #     try:
-    #         conn = sqlite3.connect(filename)
-    #         cur = conn.cursor()
-    #         cur.execute('''INSERT INTO people (name, qq, group_qq) VALUES ('')''')
-    #         print("Connected to database")
-    #     except sqlite3.Error as e:
-    #         print(e)
-    #     finally:
-    #         if conn:
-    #             conn.close()
+
+
