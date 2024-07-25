@@ -1,6 +1,5 @@
-import base64
-from io import BytesIO
-from urllib.parse import quote
+import threading
+
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
@@ -9,31 +8,39 @@ import os
 from PIL import Image
 import shutil
 import random
+import time
 
 
-def open_close_group_bot(data, timer):
+def open_close_group_bot(data, timer, bot_timer):
     if data is not None:
         data_group_id = data.get('group_id', None)
         data_messages = data.get('message', None)
         if data_group_id is not None and data_messages is not None:
             for message in data_messages:
+                print(message)
                 if message['type'] == 'text':
-                    if data_group_id == '856708153':
-                        if message['data']['text'] == 'open':
-                            if timer == 0:
-                                send_group_message('bot', '当前bot的状态为open')
-                            return 'open'
-                        elif message['data']['text'] == 'close':
-                            if timer == 0:
-                                send_group_message('bot', '当前bot的状态为close')
-                            return 'close'
-    return None
+                    if data_group_id == 856708153:
+                        # if bot_timer == 9:
+                        #     print(bot_timer)
+                        #     if timer == 0:
+                        #         send_group_message('bot', '当前bot的状态为close')
+                        #     return ['close', 0]
+                        # else:
+                            if message['data']['text'] == 'open':
+                                if timer == 0:
+                                    send_group_message('bot', '当前bot的状态为open')
+                                return ['open', bot_timer]
+                            elif message['data']['text'] == 'close':
+                                if timer == 0:
+                                    send_group_message('bot', '当前bot的状态为close')
+                                return ['close', bot_timer]
+    return [None, bot_timer]
 
 
 def check_and_save_image(data):
     if_message = False
-    message = data.get('message', None)
-    if len(message) == 2:
+    message = data.get('message', '0')
+    if len(message) == 2 and message != '0':
         if message[0]['type'] == 'text':
             if message[0]['data']['text'][:4] == 'meme':
                 if_message = True
@@ -181,6 +188,7 @@ def send_group_message_image(meme_original_path):
         get_result_image(meme_original_path)
         send_group_message_image(meme_original_path)
 
+
 def get_Mincraft_message():
     url = 'http://main.wycraft.cn:45502/up/world/world/'
     response = requests.get(url)
@@ -240,36 +248,52 @@ bot_state = 'close'
 bot_state_timer = 0
 tem_message = None
 meme_tem_path = None
+i = 0
 while True:
     json_data = check_qq_json2()
     if json_data is not None:
-        meme_image_path = check_and_save_image(json_data)
-        if meme_image_path is not None:
-            if meme_tem_path is not None:
-                image1 = Image.open(meme_image_path)
-                image2 = Image.open(meme_tem_path)
-                if image1.mode != image2.mode:
-                    image2 = image2.convert(image1.mode)
-                if image1.size != image2.size:
-                    image2 = image2.resize(image1.size)
-                if list(image1.getdata()) != list(image2.getdata()):
-                    meme_tem_path = meme_image_path
-                    get_result_image(meme_image_path)
-                    send_group_message_image(meme_image_path)
-            else:
-                meme_tem_path = meme_image_path
-                get_result_image(meme_image_path)
-                send_group_message_image(meme_image_path)
-        tem_state = open_close_group_bot(json_data, bot_state_timer)
+        # meme_image_path = check_and_save_image(json_data)
+        # if meme_image_path is not None:
+        #     if meme_tem_path is not None:
+        #         image1 = Image.open(meme_image_path)
+        #         image2 = Image.open(meme_tem_path)
+        #         if image1.mode != image2.mode:
+        #             image2 = image2.convert(image1.mode)
+        #         if image1.size != image2.size:
+        #             image2 = image2.resize(image1.size)
+        #         if list(image1.getdata()) != list(image2.getdata()):
+        #             meme_tem_path = meme_image_path
+        #             get_result_image(meme_image_path)
+        #             send_group_message_image(meme_image_path)
+        #     else:
+        #         meme_tem_path = meme_image_path
+        #         get_result_image(meme_image_path)
+        #         send_group_message_image(meme_image_path)
+        tem_state_list = open_close_group_bot(json_data, bot_state_timer, i)
+        tem_state = tem_state_list[0]
+        i = tem_state_list[1]
+        print("bot state : " + bot_state)
+        print(tem_state)
+        print(i)
         if bot_state == 'close' and tem_state == 'open':
             bot_state_timer = 0
         elif bot_state == 'open' and tem_state == 'close':
             bot_state_timer = 0
+            i = 0
         else:
             bot_state_timer = 1
+        if i == 9:
+            bot_state = 'open'
+            tem_state = 'close'
+            send_group_message('bot', '当前bot的状态为close')
+            i = 0
         if tem_state is not None:
             bot_state = tem_state
         message_list = get_Mincraft_message2()
         if message_list is not None and message_list[1] != tem_message and bot_state == 'open':
             tem_message = message_list[1]
             send_group_message(message_list[0], message_list[1])
+            i = i + 1
+
+
+

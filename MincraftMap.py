@@ -11,7 +11,7 @@ from urllib3 import Retry
 
 
 async def send_message_to_MinecraftMap(url, input_selector, message):
-    browser = await launch()
+    browser = await launch(headless=True)
     # Create a new page
     page = await browser.newPage()
 
@@ -33,7 +33,7 @@ async def send_message_to_MinecraftMap(url, input_selector, message):
 
 
 async def send_message_to_MinecraftMap2(url, input_selector, message):
-    browser = await launch()
+    browser = await launch(headless=True)
     # Create a new page
     page = await browser.newPage()
 
@@ -97,7 +97,7 @@ def get_message_from_qq(data):
         sender = data.get('sender', None)
         if data_group_id is not None and data_messages is not None and sender is not None:
             for message in data_messages:
-                if message['type'] == 'text' and data_group_id == '856708153' and message['data']['text'][:2] == 'mc':
+                if message['type'] == 'text' and data_group_id == 856708153 and message['data']['text'][:2] == 'mc':
                     content = message['data']['text'][2:]
                     nickname = sender['nickname']
                     card = sender['card']
@@ -276,6 +276,7 @@ url = 'http://main.wycraft.cn:45502/'
 input_selector = '#chatinput'
 while True:
     user_send_message = get_Mincraft_message2()
+    print(user_send_message)
     if tem_message is not None:
         print('------------------------------')
         print(tem_message)
@@ -287,6 +288,7 @@ while True:
     json_data = check_qq_json2()
     if json_data is not None:
         check_message = get_message_from_qq(json_data)
+        print(check_message)
         if check_message is not None and check_message != tem_message2:
             tem_message2 = check_message
             check_message = check_message

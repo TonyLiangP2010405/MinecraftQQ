@@ -1,22 +1,20 @@
-import requests
+# import the time module
+import time
 
 
-def test_message():
-    text = "test"
-    url = "http://localhost:3000/send_group_msg"
-    data = {
-        "group_id": "1136693630",
-        "message": [
-            {
-                "type": "text",
-                "data": {
-                    "text": text
-                }
-            }
-        ]
-    }
-    response = requests.post(url, json=data)
-    print(response)
+# define the countdown func.
+def countdown(t):
+    while t:
+        mins, secs = divmod(t, 60)
+        timer = '{:02d}:{:02d}'.format(mins, secs)
+        print(timer, end="\r")
+        time.sleep(1)
+        t -= 1
+
+    print('Fire in the hole!!')
 
 
-test_message()
+# input time in seconds
+
+# function call
+countdown(int(60))
